@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Опросник v3.6</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; display: flex; height: 100vh; margin: 0; color: #333; }
+        .container { display: flex; width: 100%; gap: 15px; padding: 15px; box-sizing: border-box; }
+        .form-side { width: 55%; overflow-y: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .result-side { width: 45%; display: flex; flex-direction: column; gap: 10px; }
+        
+        h2 { margin-top: 0; color: #c62828; border-bottom: 2px solid #ef5350; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
+        .hint { font-size: 11px; color: #2e7d32; margin-bottom: 5px; display: block; line-height: 1.4; background: #f1f8e9; padding: 6px 10px; border-left: 3px solid #4caf50; }
+        .section-title { background: #e8f5e9; padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; border-left: 5px solid #2e7d32; font-size: 14px; }
+        
+        .field-group { margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; position: relative; }
+        label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 13px; color: #263238; text-decoration: underline; }
+        
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #cfd8dc; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #fafafa; display: block; }
+        
+        textarea.auto-height {
+            min-height: 38px;
+            height: 38px;
+            resize: none;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        #z_text { min-height: 80px; resize: vertical; }
+        
+        .sticky-header { position: sticky; top: -25px; background: white; z-index: 10; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        
+        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; }
+        
+        .add-field-btn { font-size: 10px; color: #1976d2; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 5px; font-weight: bold; }
+        
+        .dynamic-field-wrapper { position: relative; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+        .dynamic-field { border-left: 2px dashed #1976d2 !important; background: #e3f2fd !important; flex-grow: 1; }
+        .remove-btn { color: #f44336; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0 5px; user-select: none; }
+
+        .buttons { display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-copy { background: #1976d2; color: white; }
+        .btn-clear { background: #f44336; color: white; width: 100px; flex: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-side" id="form_container">
+        <div class="sticky-header">
+            <div class="field-group" style="border:none; margin:0;">
+                <label>ЗАЯВКА:</label>
+                <textarea id="z_text" placeholder="Введите текст заявки..." oninput="update()"></textarea>
+            </div>
+        </div>
+
+        <h2>Старики, Инвалиды, Потеря памяти</h2>
+
+        <div class="field-group">
+            <label>Позывной, дата и время прозвона:</label>
+            <input type="text" id="z_call" oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">ФИО заявителя, номер телефона, родство, доп. номера.</span>
+            <label>Прозвон заявителя:</label>
+            <textarea class="auto-height" data-p="Прозвон заявителя: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Сверяем ФИО и ДР ПИСЬМЕННО!</span>
+            <label>Пропал:</label>
+            <textarea class="auto-height" data-p="Пропал: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Адрес пропажи, дата, время.</span>
+            <label>Коротко об обстоятельствах:</label>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Здоровье/медикаменты, диагноз, память подробно.</span>
+            <label>Здоровье:</label>
+            <textarea class="auto-height" data-p="Здоровье: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Приметы:</label>
+            <input type="text" data-p="Приметы: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Особые:</label>
+            <input type="text" data-p="Особые: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Одежда:</label>
+            <input type="text" data-p="Одежда: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>С собой:</label>
+            <input type="text" data-p="С собой: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Телефон БВП:</label>
+            <input type="text" data-p="Телефон БВП: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Проживает/прописан/пропал:</label>
+            <input type="text" data-p="Проживает/прописан/пропал: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Ранее:</label>
+            <input type="text" data-p="Ранее " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Подробности:</label>
+            <textarea class="auto-height" data-p="Подробности: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>ЗВП (Полиция):</label>
+            <textarea class="auto-height" data-p="ЗВП " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="section-title">Специальная часть</div>
+
+        <div class="field-group">
+            <label>Семья:</label>
+            <textarea class="auto-height" data-p="Семья: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Работа:</label>
+            <input type="text" data-p="Работа: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Проблемы с законом:</label>
+            <input type="text" data-p="Проблемы с законом — " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Суицид:</label>
+            <textarea class="auto-height" data-p="Суицид: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <label>Согласие на орки:</label>
+            <input type="text" id="ork_agree" placeholder="Да/Нет" oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+    </div>
+
+    <div class="result-side">
+        <div class="buttons">
+            <button class="btn-copy" onclick="copyText()">Скопировать</button>
+            <button class="btn-clear" onclick="if(confirm('Очистить всё?')) window.location.reload()">Очистить</button>
+        </div>
+        <textarea id="output" readonly></textarea>
+    </div>
+</div>
+
+<script>
+    function adjustHeight(el) {
+        el.style.height = '38px';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+
+    function adjustAndSync(el) {
+        adjustHeight(el);
+        update();
+    }
+
+    function addNewField(btn) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dynamic-field-wrapper';
+        
+        const input = document.createElement('textarea');
+        input.className = 'dynamic-field auto-height';
+        input.placeholder = 'Дополнительная информация...';
+        // Специальная метка для динамических полей
+        input.setAttribute('data-dynamic', 'true');
+        input.setAttribute('data-p', '');
+        input.oninput = function() { adjustAndSync(this); };
+        
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerHTML = '×';
+        removeBtn.onclick = function() {
+            wrapper.remove();
+            update();
+        };
+        
+        wrapper.appendChild(input);
+        wrapper.appendChild(removeBtn);
+        btn.parentNode.insertBefore(wrapper, btn);
+        input.focus();
+    }
+
+    function update() {
+        let lines = [];
+        const zText = document.getElementById('z_text').value.trim();
+        const zCall = document.getElementById('z_call').value.trim();
+        const ork = document.getElementById('ork_agree').value.trim();
+
+        if (zText !== "") {
+            lines.push("ЗАЯВКА:\n" + zText + "\n");
+        }
+
+        // Выбираем все элементы ввода, участвующие в формировании текста
+        const allInputs = document.querySelectorAll('input[data-p], textarea[data-p], #z_call');
+        
+        allInputs.forEach(el => {
+            if (el.id === 'z_call') {
+                if (el.value.trim() !== "") lines.push(el.value.trim() + "\n");
+            } else {
+                const val = el.value.trim();
+                if (val !== "") {
+                    const prefix = el.getAttribute('data-p') || "";
+                    // Если это динамическое поле, добавляем отступы
+                    if (el.hasAttribute('data-dynamic')) {
+                        lines.push("\n" + prefix + val + "\n");
+                    } else {
+                        lines.push(prefix + val);
+                    }
+                }
+            }
+        });
+
+        if (ork !== "") {
+            lines.push("\nСогласие на орки - " + ork);
+        }
+        
+        // Очищаем возможные тройные переносы строк, заменяя их на двойные
+        let result = lines.join('\n').replace(/\n{3,}/g, '\n\n');
+        document.getElementById('output').value = result.trim();
+    }
+
+    window.onload = function() {
+        const now = new Date();
+        const dt = now.toLocaleDateString('ru-RU') + " " + now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+        document.getElementById('z_call').value = "Пустельга " + dt;
+        update();
+    }
+
+    function copyText() {
+        const out = document.getElementById('output');
+        out.select();
+        document.execCommand('copy');
+    }
+</script>
+</body>
+</html>
