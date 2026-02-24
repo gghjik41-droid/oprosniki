@@ -6,15 +6,16 @@
     <title>ПСО Панель Опросников</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #263238;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-top: env(safe-area-inset-top); /* Отступ от брови */
+    background-color: #263238;
+    height: 100dvh; /* Динамическая высота для мобильных */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
         /* Шапка с кнопками */
         .header-nav {
