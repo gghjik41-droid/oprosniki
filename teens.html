@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Опросник v4.5 ЭТАЛОН (Подростки)</title>
+    <title>Опросник v4.5 ЭТАЛОН (Короткий)</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; display: flex; height: 100vh; margin: 0; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; margin: 0; color: #333; }
         .container { 
     display: flex; 
     flex-wrap: wrap; /* Разрешаем перенос на новую строку */
     width: 100%; 
+	align-items: flex-start;
     gap: 15px; 
     padding: 10px; 
-    box-sizing: border-box; 
+    box-sizing: border-box;
+	position: relative;
 }
         .form-side { 
     flex: 1 1 500px; /* Минимум 500px, если места меньше — прыгает вниз */
@@ -28,6 +30,14 @@
     flex-direction: column; 
     gap: 10px; 
     height: auto; 
+/* Настройки липкости */
+    position: -webkit-sticky; /* Для Safari */
+    position: sticky;
+    top: 20px; /* Расстояние от верха экрана */
+    
+    /* Ограничиваем высоту, чтобы внутри блока работал свой скролл, 
+       если текст результата станет очень длинным */
+    max-height: calc(100vh - 40px);
 }
 @media (max-width: 600px) {
     /* 1. Липкая панель кнопок — теперь максимально компактная */
@@ -90,20 +100,26 @@
         font-size: 13px;
     }
 }
-        h2 { margin-top: 0; color: #1976d2; border-bottom: 2px solid #64b5f6; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
+        
+        h2 { margin-top: 0; color: #211e1e; border-bottom: 2px solid #3b3535; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
         .hint { font-size: 12px; color: #2e7d32; margin-bottom: 5px; display: block; line-height: 1.4; background: #f1f8e9; padding: 6px 10px; border-left: 3px solid #4caf50; white-space: pre-wrap; }
-        .section-title { background: #e3f2fd; padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; border-left: 5px solid #1976d2; font-size: 14px; }
+        .section-title { background: #e8f5e9; padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; border-left: 5px solid #2e7d32; font-size: 14px; }
+        
         .field-group { margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; position: relative; }
         label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 13px; color: #263238; text-decoration: underline; }
+        
         input, textarea { width: 100%; padding: 10px; border: 1px solid #cfd8dc; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #fafafa; display: block; }
         textarea.auto-height { min-height: 38px; height: 38px; resize: none; overflow: hidden; line-height: 1.4; }
+
         #z_text { min-height: 80px; resize: vertical; }
         .sticky-header { position: sticky; top: -25px; background: white; z-index: 10; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; min-height: 300px; width: 100%;}
+        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; width: 100%; min-height: 600px;}
+        
         .add-field-btn { font-size: 10px; color: #1976d2; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 5px; font-weight: bold; }
         .dynamic-field-wrapper { position: relative; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
         .dynamic-field { border-left: 2px dashed #1976d2 !important; background: #f1f8e9 !important; flex-grow: 1; }
         .remove-btn { color: #f44336; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0 5px; user-select: none; }
+
         .buttons { display: flex; gap: 10px; align-items: center; }
         button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-copy { background: #1976d2; color: white; }
@@ -117,7 +133,7 @@
     <div class="form-side" id="form_container">
         <div class="sticky-header">
             <div class="field-group" style="border:none; margin:0;">
-                <label>ЗАЯВКА:</label>
+                <label>ЗАЯВКА</label>
                 <textarea id="z_text" placeholder="Введите текст заявки..." oninput="update()"></textarea>
             </div>
         </div>

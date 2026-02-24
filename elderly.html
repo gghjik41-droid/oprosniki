@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Опросник v4.3 ЭТАЛОН (Старики)</title>
+    <title>Опросник v4.5 ЭТАЛОН (Короткий)</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; display: flex; height: 100vh; margin: 0; color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; margin: 0; color: #333; }
         .container { 
     display: flex; 
     flex-wrap: wrap; /* Разрешаем перенос на новую строку */
     width: 100%; 
+	align-items: flex-start;
     gap: 15px; 
     padding: 10px; 
-    box-sizing: border-box; 
+    box-sizing: border-box;
+	position: relative;
 }
         .form-side { 
     flex: 1 1 500px; /* Минимум 500px, если места меньше — прыгает вниз */
@@ -28,6 +30,14 @@
     flex-direction: column; 
     gap: 10px; 
     height: auto; 
+/* Настройки липкости */
+    position: -webkit-sticky; /* Для Safari */
+    position: sticky;
+    top: 20px; /* Расстояние от верха экрана */
+    
+    /* Ограничиваем высоту, чтобы внутри блока работал свой скролл, 
+       если текст результата станет очень длинным */
+    max-height: calc(100vh - 40px);
 }
 @media (max-width: 600px) {
     /* 1. Липкая панель кнопок — теперь максимально компактная */
@@ -91,7 +101,7 @@
     }
 }
         
-        h2 { margin-top: 0; color: #c62828; border-bottom: 2px solid #ef5350; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
+        h2 { margin-top: 0; color: #211e1e; border-bottom: 2px solid #3b3535; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
         .hint { font-size: 12px; color: #2e7d32; margin-bottom: 5px; display: block; line-height: 1.4; background: #f1f8e9; padding: 6px 10px; border-left: 3px solid #4caf50; white-space: pre-wrap; }
         .section-title { background: #e8f5e9; padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; border-left: 5px solid #2e7d32; font-size: 14px; }
         
@@ -103,7 +113,7 @@
 
         #z_text { min-height: 80px; resize: vertical; }
         .sticky-header { position: sticky; top: -25px; background: white; z-index: 10; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; width: 100%; min-height: 300px;}
+        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; width: 100%; min-height: 600px;}
         
         .add-field-btn { font-size: 10px; color: #1976d2; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 5px; font-weight: bold; }
         .dynamic-field-wrapper { position: relative; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
@@ -135,6 +145,8 @@
             <input type="text" id="z_call" data-p=" " oninput="update()">
             <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
         </div>
+		
+		<div class="section-title">Общая часть:</div>
 
         <div class="field-group">
             <span class="hint">ФИО заявителя, номер телефона в формате 81110000000, родство
@@ -358,6 +370,7 @@
         <div class="field-group">
             <span class="hint">Что изменилось накануне пропажи/ссоры/конфликты/необычное.</span>
             <textarea class="auto-height" data-p="Накануне " oninput="adjustAndSync(this)"></textarea>
+			<label>Накануне:</label>
             <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
         </div>
 
