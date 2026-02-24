@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Опросник v4.5 ЭТАЛОН (Подростки)</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; display: flex; height: 100vh; margin: 0; color: #333; }
+        .container { display: flex; width: 100%; gap: 15px; padding: 15px; box-sizing: border-box; }
+        .form-side { width: 55%; overflow-y: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .result-side { width: 45%; display: flex; flex-direction: column; gap: 10px; }
+        h2 { margin-top: 0; color: #1976d2; border-bottom: 2px solid #64b5f6; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
+        .hint { font-size: 12px; color: #2e7d32; margin-bottom: 5px; display: block; line-height: 1.4; background: #f1f8e9; padding: 6px 10px; border-left: 3px solid #4caf50; white-space: pre-wrap; }
+        .section-title { background: #e3f2fd; padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; border-left: 5px solid #1976d2; font-size: 14px; }
+        .field-group { margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; position: relative; }
+        label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 13px; color: #263238; text-decoration: underline; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #cfd8dc; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #fafafa; display: block; }
+        textarea.auto-height { min-height: 38px; height: 38px; resize: none; overflow: hidden; line-height: 1.4; }
+        #z_text { min-height: 80px; resize: vertical; }
+        .sticky-header { position: sticky; top: -25px; background: white; z-index: 10; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; }
+        .add-field-btn { font-size: 10px; color: #1976d2; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 5px; font-weight: bold; }
+        .dynamic-field-wrapper { position: relative; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+        .dynamic-field { border-left: 2px dashed #1976d2 !important; background: #f1f8e9 !important; flex-grow: 1; }
+        .remove-btn { color: #f44336; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0 5px; user-select: none; }
+        .buttons { display: flex; gap: 10px; align-items: center; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-copy { background: #1976d2; color: white; }
+        .btn-clear { background: #f44336; color: white; width: 100px; flex: none; }
+        #save-status { font-size: 11px; color: #999; margin-left: auto; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-side" id="form_container">
+        <div class="sticky-header">
+            <div class="field-group" style="border:none; margin:0;">
+                <label>ЗАЯВКА:</label>
+                <textarea id="z_text" placeholder="Введите текст заявки..." oninput="update()"></textarea>
+            </div>
+        </div>
+
+        <h2>Подростки (12-18 лет)</h2>
+
+        <div class="field-group">
+            <label>Позывной, дата и время прозвона:</label>
+            <input type="text" id="z_call" data-p=" " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="section-title">Общая часть:</div>
+
+        <div class="field-group">
+            <span class="hint">ФИО заявителя, номер телефона в формате 81110000000, родство
+Дополнительный номер для связи с заявителем (соседи, друзья, родственники).</span>
+            <label>Прозвон заявителя:</label>
+            <textarea class="auto-height" data-p="Прозвон заявителя: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">ФИО БВП (любая смена ФИО). Сверяем ФИО письменно!
+Дата рождения и возраст. Сверяем письменно!</span>
+            <label>Пропал:</label>
+            <textarea class="auto-height" data-p="Пропал: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Коротко об обстоятельствах: адрес пропажи (город, район, улица, № дома, № подъезда, № квартиры), дата, время.</span>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)" placeholder="Обстоятельства..."></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Здоровье. Есть ли какие-либо диагнозы/принимает ли какие-либо медикаменты. Как слышит/видит/ходит, ориентир во времени и пространстве, память.</span>
+            <label>Здоровье:</label>
+            <textarea class="auto-height" data-p="Здоровье: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Приметы (рост, телосложение, цвет и длина волос, цвет глаз, носит ли бороду/усы/очки).</span>
+            <label>Приметы:</label>
+            <input type="text" data-p="Приметы: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Особые (есть ли шрамы, тату, заметные родинки/родимые пятна, особенности зубов, походки, отсутствие пальцев и тп).</span>
+            <label>Особые:</label>
+            <input type="text" data-p="Особые: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Одежда/обувь/головной убор (цвет, material, надписи).</span>
+            <label>Одежда:</label>
+            <input type="text" data-p="Одежда: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Что с собой (паспорт, наличные деньги, банковские карты, проездные, ключи, украшения, школьные принадлежности), если нет, так и пишем «паспорт – нет, наличные - нет» и т.д. Как часто и сколько дают карманных денег, копит ли, пропадало ли что-либо из дома.</span>
+            <label>С собой:</label>
+            <textarea class="auto-height" data-p="С собой: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Телефон потеряшки (даже если остался дома), на кого зарегистрирована симка, марка и модель. Если сим на заявителя - попросить взять выписку звонков. В сети ли сейчас телефон. Когда был в сети в последний раз. Спрашиваем все номера.</span>
+            <label>Телефон БВП:</label>
+            <input type="text" data-p="Телефон БВП " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Где и с кем, сколько по времени проживает/зарегистрирован(а)/пропал(а).</span>
+            <label>Проживает/прописан/пропал:</label>
+            <input type="text" data-p="Проживает/прописан/пропал: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Пропадал(а) ли ранее, когда/как и где находили.</span>
+            <label>Ранее:</label>
+            <input type="text" data-p="Ранее " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">ОБСТОЯТЕЛЬСТВА ПРОПАЖИ подробно!!! Дата и время пропажи (во сколько стал недоступен/перестал отвечать на телефон). Что предпринимали для поиска (были на месте пропажи, звонили в БРНС).</span>
+            <label>Подробности:</label>
+            <textarea class="auto-height" data-p="Подробности: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Полиция: ФИО заявителя в полицию, дата подачи заявления, название ОВД (адрес ОВД), телефон дежурной части, номер талона, номер КУСП, если есть – телефон оперативного сотрудника. Если у заявителя нет этой информации – просим узнать. Оговариваем срок подачи заявление в полицию до 3-х суток от момента поступлении заявки, в противном случае мы вынуждены будем отказать в поиске. Обязательно пишем в прозвоне, до какого срока заявитель обязуется подать заявление в полицию.
+Если заявление в полицию не подано, оговариваем срок до 3-х суток от момента поступления заявки, в противном случае мы вынуждены будем отказать в поиске. Обязательно пишем в прозвоне, до какого срока заявитель обязуется подать заявление в полицию.</span>
+            <label>ЗВП:</label>
+            <textarea class="auto-height" data-p="ЗВП " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="section-title">Специальная часть:</div>
+
+        <div class="field-group">
+            <span class="hint">Соцсети.</span>
+            <label>Соцсети:</label>
+            <input type="text" data-p="Соцсети: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Семья: какие отношения с братьями/сестрами/родителями/что разрешено ребенку, какие существуют запреты/очень осторожно - родные ли родители. Родственники в других городах. Кому больше всего доверяет.</span>
+            <label>Семья:</label>
+            <textarea class="auto-height" data-p="Семья: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Какой техникой пользуется, какая осталась дома (телефоны, планшеты, ноутбуки), если что-то осталось дома – есть ли у родителей к ней доступ.</span>
+            <label>Гаджеты:</label>
+            <textarea class="auto-height" data-p="Гаджеты: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Где учится/прошлые места учебы. Как учится/есть ли проблемы/желание учиться.</span>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)" placeholder="Учеба..."></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Одноклассники/преподаватели/взаимоотношения.</span>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)" placeholder="Одноклассники/преподаватели..."></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Друзья/подруги/контакты.</span>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)" placeholder="Друзья/подруги..."></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Есть ли парень/девушка.</span>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)" placeholder="Парень/девушка..."></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Маршруты обычные/виды транспорта/как оплачивает проезд.</span>
+            <label>Маршруты:</label>
+            <input type="text" data-p="Маршруты: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Места привязки (места, где бывает БВП)</span>
+            <label>Места привязки:</label>
+            <input type="text" data-p="Места привязки: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Как проводит свободное время/где/увлечения/интересы/секции/кружки.</span>
+            <label>Свободное время:</label>
+            <textarea class="auto-height" data-p="Свободное время: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Обычный распорядок дня/время посещения занятий/во сколько ложится спать.</span>
+            <label>Режим дня:</label>
+            <input type="text" data-p="Режим дня: " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Особенности характера/поведения/коммуникабельность. Реакция на незнакомых людей/может ли уйти с незнакомым взрослым человеком.</span>
+            <label>Характер:</label>
+            <textarea class="auto-height" data-p="Характер: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Что изменилось накануне пропажи/ссоры/конфликты/необычное.</span>
+            <label>Накануне:</label>
+            <textarea class="auto-height" data-p="Накануне " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Вредные привычки: замечали ли когда-нибудь курение, алкоголь, наркотики – если да, какие, какие странности в поведении бросались в глаза.</span>
+            <textarea class="auto-height" data-p="" oninput="adjustAndSync(this)" placeholder="Вредные привычки..."></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Состоит ли на учете в ОДН.</span>
+            <label>Учет ОДН:</label>
+            <input type="text" data-p="Учет ОДН - " oninput="update()">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Мысли о суициде – если нет, подробно, что дословно сказал заявитель, если да, из-за чего, как давно, что говорит о причинах, были ли ранее попытки/когда/способ, что говорит о способе/месте/времени.</span>
+            <label>Суицид:</label>
+            <textarea class="auto-height" data-p="Суицид: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Контакты друзей/знакомых в формате (обязательно хотя бы один доп. контакт для связи с заявителем!):</span>
+            <label>Контакты:</label>
+            <textarea class="auto-height" data-p="Контакты: " oninput="adjustAndSync(this)"></textarea>
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+
+        <div class="field-group">
+            <span class="hint">Согласие на ориентировку (не против ли родители ПРИ НЕОБХОДИМОСТИ публикации ориентировок - не настаивать, не уговаривать).</span>
+            <label>Согласие на орки:</label>
+            <input type="text" data-p="Согласие на орки - " oninput="update()" placeholder="Да/Нет">
+            <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
+        </div>
+    </div>
+
+    <div class="result-side">
+        <div class="buttons">
+            <button class="btn-copy" onclick="copyText()">Скопировать</button>
+            <button class="btn-clear" onclick="clearAllData()">Очистить</button>
+            <span id="save-status">Сохранено</span>
+        </div>
+        <textarea id="output" readonly></textarea>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = 'pso_survey_teens_v45';
+
+    function adjustHeight(el) {
+        el.style.height = '38px';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+
+    function adjustAndSync(el) {
+        adjustHeight(el);
+        update();
+    }
+
+    function addNewField(btn, val = "") {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'dynamic-field-wrapper';
+        const input = document.createElement('textarea');
+        input.className = 'dynamic-field auto-height';
+        input.placeholder = 'Дополнение...';
+        input.setAttribute('data-dynamic', 'true');
+        input.setAttribute('data-p', '');
+        input.value = val;
+        input.oninput = function() { adjustAndSync(this); };
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerHTML = '×';
+        removeBtn.onclick = function() { wrapper.remove(); update(); };
+        wrapper.appendChild(input);
+        wrapper.appendChild(removeBtn);
+        btn.parentNode.insertBefore(wrapper, btn);
+        if (!val) input.focus();
+        adjustHeight(input);
+    }
+
+    function update() {
+        let lines = [];
+        const zText = document.getElementById('z_text').value.trim();
+        if (zText !== "") lines.push("ЗАЯВКА:\n" + zText + "\n");
+
+        document.querySelectorAll('.form-side input, .form-side textarea').forEach(el => {
+            if (el.id === 'z_text' || el.id === 'output') return;
+            const val = el.value.trim();
+            if (val !== "") {
+                const prefix = el.getAttribute('data-p') || "";
+                if (el.id === 'z_call') {
+                    lines.push(prefix + val + "\n");
+                } else {
+                    lines.push(prefix + val);
+                }
+            }
+        });
+
+        document.getElementById('output').value = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+        saveData();
+    }
+
+    function saveData() {
+        const data = { static: {}, dynamic: [] };
+        document.querySelectorAll('input, textarea').forEach((el, index) => {
+            if (el.id === 'output') return;
+            if (el.hasAttribute('data-dynamic')) {
+                const parentGroup = el.closest('.field-group');
+                const groupIdx = Array.from(document.querySelectorAll('.field-group')).indexOf(parentGroup);
+                data.dynamic.push({ groupIdx: groupIdx, value: el.value });
+            } else {
+                data.static[el.id || 'idx_' + index] = el.value;
+            }
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        document.getElementById('save-status').innerText = "Сохранено " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return false;
+        const data = JSON.parse(raw);
+        document.querySelectorAll('input, textarea').forEach((el, index) => {
+            const val = data.static[el.id || 'idx_' + index];
+            if (val !== undefined) el.value = val;
+            if (el.classList.contains('auto-height')) adjustHeight(el);
+        });
+        if (data.dynamic) {
+            const groups = document.querySelectorAll('.field-group');
+            data.dynamic.forEach(item => {
+                if (groups[item.groupIdx]) addNewField(groups[item.groupIdx].querySelector('.add-field-btn'), item.value);
+            });
+        }
+        return true;
+    }
+
+    function clearAllData() {
+        if(confirm('Очистить опросник?')) {
+            localStorage.removeItem(STORAGE_KEY);
+            window.location.reload();
+        }
+    }
+
+    window.onload = function() {
+        if (!loadData()) {
+            const now = new Date();
+            const dt = now.toLocaleDateString('ru-RU') + " " + now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+            document.getElementById('z_call').value = dt;
+        }
+        update();
+    }
+
+    function copyText() {
+        const out = document.getElementById('output');
+        out.select();
+        document.execCommand('copy');
+        const btn = document.querySelector('.btn-copy');
+        btn.innerText = "СКОПИРОВАНО!";
+        setTimeout(() => btn.innerText = "Скопировать", 1500);
+    }
+</script>
+</body>
+</html>

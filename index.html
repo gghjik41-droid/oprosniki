@@ -2,353 +2,122 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Универсальный Опросник v4.2 (Автосохранение)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ПСО Панель Опросников</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; display: flex; height: 100vh; margin: 0; color: #333; }
-        .container { display: flex; width: 100%; gap: 15px; padding: 15px; box-sizing: border-box; }
-        .form-side { width: 55%; overflow-y: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .result-side { width: 45%; display: flex; flex-direction: column; gap: 10px; }
-        
-        .tab-container { display: flex; gap: 5px; margin-bottom: 20px; background: #f5f5f5; padding: 5px; border-radius: 8px; }
-        .tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; border-radius: 6px; font-weight: bold; transition: 0.3s; font-size: 13px; }
-        .tab.active { background: #1976d2; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        
-        .mode-seniors h2 { color: #c62828; border-bottom: 2px solid #ef5350; }
-        .mode-seniors .section-title { background: #e8f5e9; border-left: 5px solid #2e7d32; color: #1b5e20; }
-        .mode-teens h2 { color: #1565c0; border-bottom: 2px solid #1e88e5; }
-        .mode-teens .section-title { background: #e3f2fd; border-left: 5px solid #1565c0; color: #0d47a1; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #263238;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-        h2 { margin-top: 0; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
-        .hint { font-size: 11px; color: #2e7d32; margin-bottom: 5px; display: block; line-height: 1.4; background: #f1f8e9; padding: 6px 10px; border-left: 3px solid #4caf50; }
-        .section-title { padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; font-size: 14px; }
-        
-        .field-group { margin-bottom: 25px; border-bottom: 1px solid #f0f0f0; padding-bottom: 10px; position: relative; }
-        label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 13px; color: #263238; text-decoration: underline; }
-        
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #cfd8dc; border-radius: 6px; box-sizing: border-box; font-size: 14px; background: #fafafa; display: block; }
-        textarea.auto-height { min-height: 38px; height: 38px; resize: none; overflow: hidden; line-height: 1.4; }
-        #z_text { min-height: 80px; resize: vertical; }
-        .sticky-header { position: sticky; top: -25px; background: white; z-index: 10; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; }
-        
-        .add-field-btn { font-size: 10px; color: #1976d2; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 5px; font-weight: bold; }
-        .dynamic-field-wrapper { position: relative; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
-        .dynamic-field { border-left: 2px dashed #1976d2 !important; background: #e3f2fd !important; flex-grow: 1; }
-        .remove-btn { color: #f44336; cursor: pointer; font-weight: bold; font-size: 18px; padding: 0 5px; user-select: none; }
+        /* Шапка с кнопками */
+        .header-nav {
+            background-color: #37474f;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
 
-        .buttons { display: flex; gap: 10px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        .btn-copy { background: #1976d2; color: white; }
-        .btn-clear { background: #f44336; color: white; width: 100px; flex: none; }
-        
-        /* Индикатор сохранения */
-        #save-status { font-size: 10px; color: #999; text-align: right; margin-bottom: 5px; font-style: italic; }
+        .nav-btn {
+            background-color: #455a64;
+            color: #cfd8dc;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+        }
+
+        .nav-btn:hover {
+            background-color: #546e7a;
+            color: #fff;
+        }
+
+        .nav-btn.active {
+            background-color: #00c853; /* Ярко-зеленый для активной вкладки */
+            color: #fff;
+            box-shadow: 0 0 12px rgba(0, 200, 83, 0.4);
+        }
+
+        /* Контейнер для опросников */
+        .iframe-container {
+            flex-grow: 1;
+            width: 100%;
+            border: none;
+            background-color: #eceff1;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
-<body class="mode-seniors">
+<body>
 
-<div class="container">
-    <div class="form-side">
-        <div class="tab-container">
-            <div id="tab_seniors" class="tab active" onclick="switchMode('seniors')">СТАРИКИ / ИНВАЛИДЫ</div>
-            <div id="tab_teens" class="tab" onclick="switchMode('teens')">ПОДРОСТКИ (12-18)</div>
-        </div>
+<div class="header-nav" id="menu">
+    <button class="nav-btn" onclick="openSurvey('short.html', this)">Короткий</button>
+    <button class="nav-btn" onclick="openSurvey('elderly.html', this)">Старики</button>
+    <button class="nav-btn" onclick="openSurvey('teens.html', this)">Подростки</button>
+    <button class="nav-btn" onclick="openSurvey('forest.html', this)">Лес</button>
+    <button class="nav-btn" onclick="openSurvey('adults.html', this)">Взрослые</button>
+</div>
 
-        <div class="sticky-header">
-            <div class="field-group" style="border:none; margin:0;">
-                <label>ЗАЯВКА:</label>
-                <textarea id="z_text" placeholder="Введите текст заявки..." oninput="update()"></textarea>
-            </div>
-        </div>
-
-        <div id="dynamic_questions"></div>
-    </div>
-
-    <div class="result-side">
-        <div id="save-status">Данные сохранены локально</div>
-        <div class="buttons">
-            <button class="btn-copy" onclick="copyText()">Скопировать</button>
-            <button class="btn-clear" onclick="clearAllData()">Очистить</button>
-        </div>
-        <textarea id="output" readonly></textarea>
-    </div>
+<div class="iframe-container">
+    <iframe src="short.html" id="survey-frame"></iframe>
 </div>
 
 <script>
-    let currentMode = 'seniors';
+    function openSurvey(fileName, btn) {
+        // Меняем файл в iframe
+        document.getElementById('survey-frame').src = fileName;
 
-    const seniorConfig = {
-        title: "Старики, Инвалиды, Потеря памяти",
-        questions: [
-            { label: "Позывной, дата и время прозвона:", type: "input", id: "z_call" },
-            { label: "Прозвон заявителя:", hint: "ФИО заявителя, номер телефона в формате 81110000000, родство. Доп. номер для связи.", type: "textarea", p: "Прозвон заявителя: " },
-            { label: "Пропал:", hint: "ФИО БВП (любая смена ФИО), ДР и возраст. Сверяем ПИСЬМЕННО!", type: "textarea", p: "Пропал: " },
-            { label: "Коротко об обстоятельствах:", hint: "Адрес пропажи, дата, время.", type: "textarea", p: "" },
-            { label: "Здоровье:", hint: "Здоровье/медикаменты, диагноз, память подробно. Ориентируется ли, назовет ли себя.", type: "textarea", p: "Здоровье: " },
-            { label: "Приметы:", type: "input", p: "Приметы: " },
-            { label: "Особые:", type: "input", p: "Особые: " },
-            { label: "Одежда:", type: "input", p: "Одежда: " },
-            { label: "С собой:", type: "input", p: "С собой: " },
-            { label: "Телефон БВП:", type: "input", p: "Телефон БВП: " },
-            { label: "Проживает/прописан/пропал:", type: "input", p: "Проживает/прописан/пропал: " },
-            { label: "Ранее:", type: "input", p: "Ранее " },
-            { label: "Подробности:", type: "textarea", p: "Подробности: " },
-            { label: "ЗВП (Полиция):", type: "textarea", p: "ЗВП " },
-            { type: "section", title: "Специальная часть" },
-            { label: "Семья:", type: "textarea", p: "Семья: " },
-            { label: "Работа:", type: "input", p: "Работа: " },
-            { label: "Проблемы с законом:", type: "input", p: "Проблемы с законом — " },
-            { label: "Суицид:", type: "textarea", p: "Суицид: " },
-            { label: "Согласие на орки:", id: "ork_agree", type: "input", p: "\nСогласие на орки - " }
-        ]
-    };
+        // Снимаем активный класс со всех кнопок
+        const buttons = document.querySelectorAll('.nav-btn');
+        buttons.forEach(b => b.classList.remove('active'));
 
-    const teenConfig = {
-        title: "Подростки (12-18 лет)",
-        questions: [
-            { label: "Позывной, дата и время прозвона:", type: "input", id: "z_call" },
-            { label: "Прозвон заявителя:", type: "textarea", p: "Прозвон заявителя: " },
-            { label: "Пропал:", type: "textarea", p: "Пропал: " },
-            { label: "Коротко об обстоятельствах:", type: "textarea", p: "" },
-            { label: "Здоровье:", type: "textarea", p: "Здоровье: " },
-            { label: "Приметы:", type: "input", p: "Приметы: " },
-            { label: "Особые:", type: "input", p: "Особые: " },
-            { label: "Одежда:", type: "input", p: "Одежда: " },
-            { label: "С собой:", type: "textarea", p: "С собой: " },
-            { label: "Телефон БВП:", type: "input", p: "Телефон БВП: " },
-            { label: "Проживает/прописан/пропал:", type: "input", p: "Проживает: " },
-            { label: "Ранее:", type: "input", p: "Ранее " },
-            { label: "Подробности:", type: "textarea", p: "Подробности: " },
-            { label: "Полиция:", type: "textarea", p: "Полиция: " },
-            { type: "section", title: "Специальная часть" },
-            { label: "Соцсети:", type: "input", p: "Соцсети: " },
-            { label: "Семья:", type: "textarea", p: "Семья: " },
-            { label: "Доверие:", type: "input", p: "Доверяет: " },
-            { label: "Техника:", type: "textarea", p: "Техника: " },
-            { label: "Учеба и друзья:", type: "textarea", p: "Учеба/Друзья: " },
-            { label: "Маршруты и досуг:", type: "textarea", p: "Маршруты/Досуг: " },
-            { label: "Характер и конфликты:", type: "textarea", p: "Характер: " },
-            { label: "Вредные привычки:", type: "input", p: "Вредные привычки: " },
-            { label: "Суицид:", type: "textarea", p: "Суицид: " },
-            { label: "Контакты друзей:", type: "textarea", p: "Контакты друзей: " },
-            { label: "Согласие на ориентировку:", id: "ork_agree", type: "input", p: "\nСогласие на ориентировку - " }
-        ]
-    };
-
-    function switchMode(mode) {
-        currentMode = mode;
-        document.body.className = mode === 'seniors' ? 'mode-seniors' : 'mode-teens';
-        document.getElementById('tab_seniors').classList.toggle('active', mode === 'seniors');
-        document.getElementById('tab_teens').classList.toggle('active', mode === 'teens');
-        render();
-        saveData();
-    }
-
-    function render() {
-        const container = document.getElementById('dynamic_questions');
-        container.innerHTML = '';
-        const config = currentMode === 'seniors' ? seniorConfig : teenConfig;
-
-        const h2 = document.createElement('h2');
-        h2.innerText = config.title;
-        container.appendChild(h2);
-
-        config.questions.forEach((q, index) => {
-            if (q.type === 'section') {
-                const sec = document.createElement('div');
-                sec.className = 'section-title';
-                sec.innerText = q.title;
-                container.appendChild(sec);
-                return;
-            }
-
-            const group = document.createElement('div');
-            group.className = 'field-group';
-            if (q.hint) {
-                const hint = document.createElement('span');
-                hint.className = 'hint';
-                hint.innerText = q.hint;
-                group.appendChild(hint);
-            }
-            const lbl = document.createElement('label');
-            lbl.innerText = q.label;
-            group.appendChild(lbl);
-
-            const el = document.createElement(q.type === 'textarea' ? 'textarea' : 'input');
-            if (q.type === 'textarea') el.className = 'auto-height';
-            
-            // Важно: даем уникальный индекс для сохранения
-            el.setAttribute('data-index', index);
-            if (q.id) el.id = q.id;
-            el.setAttribute('data-p', q.p || '');
-            el.oninput = function() {
-                if (q.type === 'textarea') adjustHeight(this);
-                update();
-                saveData();
-            };
-            group.appendChild(el);
-
-            const btn = document.createElement('a');
-            btn.className = 'add-field-btn';
-            btn.innerText = '[+] ДОБАВИТЬ поле вне вопроса';
-            btn.onclick = function() { addNewField(this); };
-            group.appendChild(btn);
-
-            container.appendChild(group);
-        });
+        // Добавляем активный класс нажатой кнопке
+        btn.classList.add('active');
         
-        loadSavedInputs();
-        update();
+        // Запоминаем выбор
+        localStorage.setItem('last_survey_file', fileName);
     }
 
-    function adjustHeight(el) {
-        el.style.height = '38px';
-        el.style.height = (el.scrollHeight) + 'px';
-    }
-
-    function addNewField(btn, val = "") {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'dynamic-field-wrapper';
-        const input = document.createElement('textarea');
-        input.className = 'dynamic-field auto-height';
-        input.placeholder = 'Дополнительная информация...';
-        input.setAttribute('data-dynamic', 'true');
-        input.setAttribute('data-p', '');
-        input.value = val;
-        input.oninput = function() { 
-            adjustHeight(this); 
-            update(); 
-            saveData();
-        };
-        const rm = document.createElement('span');
-        rm.className = 'remove-btn';
-        rm.innerHTML = '×';
-        rm.onclick = function() { 
-            wrapper.remove(); 
-            update(); 
-            saveData();
-        };
-        wrapper.appendChild(input);
-        wrapper.appendChild(rm);
-        btn.parentNode.insertBefore(wrapper, btn);
-        if (val) adjustHeight(input);
-        else input.focus();
-    }
-
-    function update() {
-        let lines = [];
-        const z = document.getElementById('z_text').value.trim();
-        if (z) lines.push("ЗАЯВКА:\n" + z + "\n");
-
-        const inputs = document.querySelectorAll('#dynamic_questions input, #dynamic_questions textarea');
-        let orkVal = "";
-        
-        inputs.forEach(el => {
-            if (el.id === 'ork_agree') {
-                if (el.value.trim()) orkVal = el.getAttribute('data-p') + el.value.trim();
-                return;
-            }
-            if (el.id === 'z_call') {
-                if (el.value.trim()) lines.push(el.value.trim() + "\n");
-            } else {
-                const val = el.value.trim();
-                if (val) {
-                    const p = el.getAttribute('data-p');
-                    if (el.hasAttribute('data-dynamic')) lines.push("\n" + p + val + "\n");
-                    else lines.push(p + val);
-                }
-            }
-        });
-
-        if (orkVal) lines.push(orkVal);
-        document.getElementById('output').value = lines.join('\n').replace(/\n{3,}/g, '\n\n').trim();
-    }
-
-    // ЛОГИКА АВТОСОХРАНЕНИЯ
-    function saveData() {
-        const data = {
-            mode: currentMode,
-            z_text: document.getElementById('z_text').value,
-            inputs: {},
-            dynamic: []
-        };
-
-        // Сохраняем основные поля
-        document.querySelectorAll('#dynamic_questions [data-index]').forEach(el => {
-            data.inputs[el.getAttribute('data-index')] = el.value;
-        });
-
-        // Сохраняем динамические поля (те, что через [+])
-        document.querySelectorAll('.dynamic-field').forEach(el => {
-            // Ищем, к какому вопросу (field-group) относится это поле
-            const parentGroup = el.closest('.field-group');
-            const mainLabel = parentGroup.querySelector('label').innerText;
-            data.dynamic.push({ label: mainLabel, value: el.value });
-        });
-
-        localStorage.setItem('oprosnik_backup', JSON.stringify(data));
-        document.getElementById('save-status').innerText = "Изменения сохранены " + new Date().toLocaleTimeString();
-    }
-
-    function loadSavedInputs() {
-        const saved = localStorage.getItem('oprosnik_backup');
-        if (!saved) {
-            // Если памяти нет, ставим позывной по дефолту
-            const now = new Date();
-            const dt = now.toLocaleDateString('ru-RU') + " " + now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
-            if (document.getElementById('z_call')) document.getElementById('z_call').value = "Пустельга " + dt;
-            return;
-        }
-
-        const data = JSON.parse(saved);
-        
-        // Восстанавливаем заявку
-        document.getElementById('z_text').value = data.z_text || "";
-
-        // Восстанавливаем основные поля по индексам
-        for (let idx in data.inputs) {
-            const el = document.querySelector(`[data-index="${idx}"]`);
-            if (el) {
-                el.value = data.inputs[idx];
-                if (el.tagName === 'TEXTAREA') adjustHeight(el);
-            }
-        }
-
-        // Восстанавливаем динамические поля
-        if (data.dynamic) {
-            data.dynamic.forEach(item => {
-                const groups = document.querySelectorAll('.field-group');
-                groups.forEach(group => {
-                    if (group.querySelector('label').innerText === item.label) {
-                        const btn = group.querySelector('.add-field-btn');
-                        addNewField(btn, item.value);
-                    }
-                });
-            });
-        }
-    }
-
-    function clearAllData() {
-        if(confirm('Очистить все данные и черновик?')) {
-            localStorage.removeItem('oprosnik_backup');
-            window.location.reload();
-        }
-    }
-
-    function copyText() {
-        const out = document.getElementById('output');
-        out.select();
-        document.execCommand('copy');
-    }
-
+    // При загрузке страницы
     window.onload = function() {
-        const saved = localStorage.getItem('oprosnik_backup');
-        if (saved) {
-            const data = JSON.parse(saved);
-            currentMode = data.mode || 'seniors';
+        const last = localStorage.getItem('last_survey_file');
+        const buttons = document.querySelectorAll('.nav-btn');
+        
+        if (last) {
+            let found = false;
+            buttons.forEach(b => {
+                if (b.getAttribute('onclick').includes(last)) {
+                    openSurvey(last, b);
+                    found = true;
+                }
+            });
+            // Если файл из истории не найден (например, переименовали), грузим первый
+            if (!found) openSurvey('short.html', buttons[0]);
+        } else {
+            // Самый первый запуск — активируем Короткий
+            openSurvey('short.html', buttons[0]);
         }
-        switchMode(currentMode);
     };
 </script>
+
 </body>
 </html>
