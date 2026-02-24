@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ПСО Панель Опросников</title>
-<style>
+    <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
@@ -23,16 +23,37 @@
             display: flex;
             justify-content: center;
             gap: 8px;
-            flex-wrap: nowrap; /* Запрещаем перенос на новую строку */
+            flex-wrap: nowrap;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
             z-index: 100;
-            overflow-x: auto; /* Включаем прокрутку, если кнопки не влезают */
-            scrollbar-width: none; /* Прячем скроллбар в Firefox */
+            overflow-x: auto;
+            scrollbar-width: none;
         }
 
-        /* Прячем скроллбар для Chrome/Safari */
         .header-nav::-webkit-scrollbar {
             display: none;
+        }
+
+        /* Кнопка сброса (Крестик) */
+        .clear-btn {
+            background-color: #b71c1c; /* Глубокий красный */
+            color: white;
+            border: none;
+            width: 38px; /* Делаем её квадратной */
+            height: 38px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .clear-btn:hover {
+            background-color: #e53935;
         }
 
         .nav-btn {
@@ -46,8 +67,8 @@
             font-size: 13px;
             transition: all 0.2s ease;
             text-transform: uppercase;
-            white-space: nowrap; /* Текст кнопки всегда в одну строку */
-            flex-shrink: 0; /* Кнопки не сжимаются в размере */
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .nav-btn:hover {
@@ -61,7 +82,6 @@
             box-shadow: 0 0 12px rgba(0, 200, 83, 0.4);
         }
 
-        /* Контейнер для опросников */
         .iframe-container {
             flex-grow: 1;
             width: 100%;
@@ -75,16 +95,20 @@
             border: none;
         }
 
-        /* Адаптация под маленькие экраны (телефоны) */
         @media (max-width: 600px) {
             .header-nav {
-                justify-content: flex-start; /* На мобилках выравниваем от левого края */
+                justify-content: flex-start;
                 padding: 8px;
             }
 
             .nav-btn {
                 padding: 8px 14px;
-                font-size: 11px; /* Чуть меньше шрифт на телефоне */
+                font-size: 11px;
+            }
+            
+            .clear-btn {
+                width: 34px;
+                height: 34px;
             }
         }
     </style>
@@ -92,6 +116,8 @@
 <body>
 
 <div class="header-nav" id="menu">
+    <button class="clear-btn" onclick="clearAllData()" title="Очистить все формы">✕</button>
+    
     <button class="nav-btn" onclick="openSurvey('short.html', this)">Короткий</button>
     <button class="nav-btn" onclick="openSurvey('elderly.html', this)">Старики</button>
     <button class="nav-btn" onclick="openSurvey('teens.html', this)">Подростки</button>
@@ -105,21 +131,23 @@
 
 <script>
     function openSurvey(fileName, btn) {
-        // Меняем файл в iframe
         document.getElementById('survey-frame').src = fileName;
-
-        // Снимаем активный класс со всех кнопок
         const buttons = document.querySelectorAll('.nav-btn');
         buttons.forEach(b => b.classList.remove('active'));
-
-        // Добавляем активный класс нажатой кнопке
         btn.classList.add('active');
-        
-        // Запоминаем выбор
         localStorage.setItem('last_survey_file', fileName);
     }
 
-    // При загрузке страницы
+    // Функция полной очистки
+    function clearAllData() {
+        if (confirm("Внимание! Это удалит все введенные данные во ВСЕХ вкладках. Очистить?")) {
+            localStorage.clear();
+            // Перезагружаем текущий iframe, чтобы он обнулился визуально
+            const frame = document.getElementById('survey-frame');
+            frame.src = frame.src; 
+        }
+    }
+
     window.onload = function() {
         const last = localStorage.getItem('last_survey_file');
         const buttons = document.querySelectorAll('.nav-btn');
@@ -127,15 +155,14 @@
         if (last) {
             let found = false;
             buttons.forEach(b => {
-                if (b.getAttribute('onclick').includes(last)) {
+                // Исправлено: ищем точное совпадение в аргументе функции
+                if (b.getAttribute('onclick').includes("'" + last + "'")) {
                     openSurvey(last, b);
                     found = true;
                 }
             });
-            // Если файл из истории не найден (например, переименовали), грузим первый
             if (!found) openSurvey('short.html', buttons[0]);
         } else {
-            // Самый первый запуск — активируем Короткий
             openSurvey('short.html', buttons[0]);
         }
     };
