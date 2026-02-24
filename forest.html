@@ -2,13 +2,94 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Опросник v4.5 ЭТАЛОН (Лес)</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #eceff1; display: flex; height: 100vh; margin: 0; color: #333; }
-        .container { display: flex; width: 100%; gap: 15px; padding: 15px; box-sizing: border-box; }
-        .form-side { width: 55%; overflow-y: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .result-side { width: 45%; display: flex; flex-direction: column; gap: 10px; }
-        
+        .container { 
+    display: flex; 
+    flex-wrap: wrap; /* Разрешаем перенос на новую строку */
+    width: 100%; 
+    gap: 15px; 
+    padding: 10px; 
+    box-sizing: border-box; 
+}
+        .form-side { 
+    flex: 1 1 500px; /* Минимум 500px, если места меньше — прыгает вниз */
+    background: white; 
+    padding: 20px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+    overflow-y: visible; /* Убираем внутреннюю прокрутку для мобилок */
+}
+        .result-side { 
+    flex: 1 1 400px; /* Минимум 400px */
+    display: flex; 
+    flex-direction: column; 
+    gap: 10px; 
+    height: auto; 
+}
+@media (max-width: 600px) {
+    /* 1. Липкая панель кнопок — теперь максимально компактная */
+    .buttons {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #eceff1;
+        padding: 8px 0;
+        display: flex;
+        gap: 8px;
+        flex-direction: row; /* Кнопки в ряд */
+    }
+
+    .btn {
+        flex: 1; /* Кнопки одинаковой ширины */
+        padding: 10px 5px;
+        font-size: 12px;
+    }
+
+    /* 2. Компактные заголовки */
+    h2 {
+        font-size: 1.1rem;
+        margin: 10px 0;
+        text-align: center;
+    }
+
+    .result-side h2 {
+        font-size: 0.9rem;
+        margin: 5px 0;
+    }
+
+    /* 3. Оптимизация полей ввода (меньше отступов) */
+    .container {
+        padding: 5px;
+    }
+
+    .form-side {
+        padding: 15px;
+        flex: 1 1 100%; /* Занимает всю ширину */
+    }
+
+    .form-group {
+        margin-bottom: 8px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        margin-bottom: 2px;
+    }
+
+    input, select, textarea {
+        padding: 10px; /* Удобно нажимать пальцем */
+        font-size: 16px; /* Чтобы iPhone не приближал экран при вводе */
+    }
+
+    /* 4. Поле вывода результата */
+    #output {
+        min-height: 250px;
+        font-size: 13px;
+    }
+}       
         h2 { margin-top: 0; color: #2e7d32; border-bottom: 2px solid #81c784; padding-bottom: 10px; font-size: 18px; text-transform: uppercase; }
         .hint { font-size: 11px; color: #1b5e20; margin-bottom: 5px; display: block; line-height: 1.4; background: #f1f8e9; padding: 6px 10px; border-left: 3px solid #4caf50; white-space: pre-wrap; }
         .section-title { background: #f1f8e9; padding: 8px 12px; font-weight: bold; margin: 25px 0 15px 0; border-left: 5px solid #2e7d32; font-size: 14px; }
@@ -21,7 +102,7 @@
 
         #z_text { min-height: 80px; resize: vertical; }
         .sticky-header { position: sticky; top: -25px; background: white; z-index: 10; padding-bottom: 10px; border-bottom: 2px solid #eee; margin-bottom: 15px; }
-        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; }
+        #output { flex-grow: 1; padding: 15px; border-radius: 10px; border: 1px solid #b0bec5; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.2; background: #fff; white-space: pre-wrap; overflow-y: auto; min-height: 300px; width: 100%;}
         
         .add-field-btn { font-size: 10px; color: #1976d2; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 5px; font-weight: bold; }
         .dynamic-field-wrapper { position: relative; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
