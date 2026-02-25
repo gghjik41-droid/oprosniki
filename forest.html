@@ -124,8 +124,8 @@
         button { flex: 1; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
         .btn-copy { background: #1976d2; color: white; }
         .btn-clear { background: #f44336; color: white; width: 100px; flex: none; }
-        #save-status { font-size: 11px; color: #999; margin-left: auto; }
-    </style>
+        #save-status { font-size: 12px; color: #999; margin-left: auto; text-align: center; white-space: pre-line; }
+    </style>	
 </head>
 <body>
 
@@ -424,7 +424,7 @@
             }
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        document.getElementById('save-status').innerText = "Сохранено " + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        document.getElementById('save-status').innerText = "Сохранено " + "\n" + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
     }
 
     function loadData() {

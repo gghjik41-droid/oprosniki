@@ -2,20 +2,24 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ПСО Панель Опросников</title>
+    
+    <script data-goatcounter="https://gghjik41.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
     <style>
         body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    padding: 0;
-    padding-top: env(safe-area-inset-top); /* Отступ от брови */
-    background-color: #263238;
-    height: 100dvh; /* Динамическая высота для мобильных */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            /* Используем безопасную зону сверху для Айфонов с челкой */
+            padding-top: env(safe-area-inset-top); 
+            background-color: #263238;
+            height: 100dvh; 
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
         /* Шапка с кнопками */
         .header-nav {
@@ -29,18 +33,20 @@
             z-index: 100;
             overflow-x: auto;
             scrollbar-width: none;
+            /* Отступы по бокам для безрамочных экранов */
+            padding-left: max(8px, env(safe-area-inset-left));
+            padding-right: max(8px, env(safe-area-inset-right));
         }
 
         .header-nav::-webkit-scrollbar {
             display: none;
         }
 
-        /* Кнопка сброса (Крестик) */
         .clear-btn {
-            background-color: #b71c1c; /* Глубокий красный */
+            background-color: #b71c1c;
             color: white;
             border: none;
-            width: 30px; /* Делаем её квадратной */
+            width: 30px;
             height: 30px;
             border-radius: 4px;
             cursor: pointer;
@@ -53,9 +59,7 @@
             transition: background 0.2s;
         }
 
-        .clear-btn:hover {
-            background-color: #e53935;
-        }
+        .clear-btn:hover { background-color: #e53935; }
 
         .nav-btn {
             background-color: #455a64;
@@ -72,10 +76,7 @@
             flex-shrink: 0;
         }
 
-        .nav-btn:hover {
-            background-color: #546e7a;
-            color: #fff;
-        }
+        .nav-btn:hover { background-color: #546e7a; color: #fff; }
 
         .nav-btn.active {
             background-color: #00c853; 
@@ -99,7 +100,8 @@
         @media (max-width: 600px) {
             .header-nav {
                 justify-content: flex-start;
-                padding: 8px;
+                padding-top: 8px;
+                padding-bottom: 8px;
             }
 
             .nav-btn {
