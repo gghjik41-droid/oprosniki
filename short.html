@@ -132,10 +132,45 @@
 <div class="container">
     <div class="form-side" id="form_container">
         <div class="sticky-header">
-            <div class="field-group" style="border:none; margin:0;">
-                <label>ЗАЯВКА</label>
-                <textarea id="z_text" data-p="" placeholder="Введите текст заявки..." oninput="update()"></textarea>
-            </div>
+<div class="field-group" id="z_container" style="margin-bottom: 15px;">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5px;">
+    <label style="margin-bottom: 0; display: inline-block;">ЗАЯВКА</label>
+    
+    <button id="z_edit_btn" onclick="editZ()" style="
+        display: none; 
+        width: auto !important; /* Запрещаем растягивание */
+        flex: none; 
+        background: #90a4ae; 
+        color: white; 
+        border: none; 
+        border-radius: 4px; 
+        padding: 2px 8px; 
+        font-size: 10px; 
+        line-height: 1.2;
+        height: 20px; 
+        cursor: pointer; 
+        text-transform: none;
+        margin: 0;
+    ">Изм.</button>
+</div>
+    
+    <textarea id="z_text" placeholder="Вставьте текст заявки и нажмите OK..." style="min-height: 120px;"></textarea>
+    
+    <div id="z_fixed" style="display: none; background: #f1f8e9; padding: 10px; border-radius: 8px; border: 1px solid #c8e6c9;">
+        <div id="z_value" style="
+    font-size: 12px; 
+    color: #1b5e20; 
+    white-space: pre-wrap; 
+    line-height: 1.5em;       /* Четкая высота строки */
+    max-height: 7.5em;        /* Высота ровно на 5 строк (1.5 * 5) */
+    overflow-y: auto; 
+    scroll-snap-type: y mandatory; /* Включаем примагничивание по вертикали */
+    padding-right: 5px;
+"></div>
+    </div>
+    
+    <button id="z_confirm_btn" onclick="fixZ()" style="margin-top: 8px; background: #4caf50; color: white; border: none; border-radius: 6px; padding: 10px; width: 100%; cursor: pointer; font-weight: bold;">ОК</button>
+</div>
         </div>
 
         <h2>Короткий</h2>
@@ -397,6 +432,52 @@
         btn.innerText = "СКОПИРОВАНО!";
         setTimeout(() => btn.innerText = "Скопировать", 1500);
     }
+	
+	function fixZ() {
+    const input = document.getElementById('z_text');
+    const fixedDiv = document.getElementById('z_fixed');
+    const fixedValue = document.getElementById('z_value');
+    const confirmBtn = document.getElementById('z_confirm_btn');
+    const editBtn = document.getElementById('z_edit_btn');
+
+    if (input.value.trim() !== "") {
+        // Очищаем блок перед вставкой
+        fixedValue.innerHTML = "";
+        
+        // Разбиваем текст на строки и оборачиваем каждую в span
+        const lines = input.value.split('\n');
+        lines.forEach(line => {
+            const span = document.createElement('span');
+            span.style.display = 'block';
+            span.style.scrollSnapAlign = 'start'; // Каждая строка — точка остановки
+            span.innerText = line || ' '; // Если строка пустая, ставим пробел
+            fixedValue.appendChild(span);
+        });
+
+        input.style.display = 'none';
+        confirmBtn.style.display = 'none';
+        fixedDiv.style.display = 'block';
+        editBtn.style.display = 'block';
+        
+        if (typeof update === "function") update();
+    }
+}
+function editZ() {
+    const input = document.getElementById('z_text');
+    const fixedDiv = document.getElementById('z_fixed');
+    const confirmBtn = document.getElementById('z_confirm_btn');
+    const editBtn = document.getElementById('z_edit_btn');
+
+    // Возвращаем всё как было
+    input.style.display = 'block';
+    confirmBtn.style.display = 'block';
+    fixedDiv.style.display = 'none';
+    editBtn.style.display = 'none';
+
+    // Ставим курсор в поле, чтобы сразу можно было править
+    input.focus();
+}
+;
 </script>
 </body>
 </html>
