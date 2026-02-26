@@ -43,11 +43,22 @@
 
 <h2>Старики, Инвалиды, Потеря памяти</h2>
 
-    <div class="field-group">
-        <label>Позывной, дата и время прозвона:</label>
-        <input type="text" id="z_call" class="q-field-no-output" data-p="">
-        <a class="add-field-btn" onclick="addNewField(this)">[+] ДОБАВИТЬ поле вне вопроса</a>
-    </div>
+	<div class="field-group">
+		<label>Позывной, дата и время прозвона:</label>
+		<div style="display: flex; height: 38px; overflow: hidden; border: 1px solid #ccc; border-radius: 4px;">
+			<input type="text" id="z_call" class="q-field-no-output" 
+				   placeholder="Позывной ДД.ММ.ГГГГ ЧЧ:ММ" 
+				   oninput="syncEverything()" 
+				   style="flex: 1; border: none; padding: 0 10px; height: 100%; outline: none; box-sizing: border-box;">
+			
+			<button type="button" onclick="setCurrentTime()" title="Обновить время" 
+					style="width: 38px; height: 100%; background: #4caf50; color: white; border: none; 
+						   border-left: 1px solid #ccc; cursor: pointer; display: flex; 
+						   align-items: center; justify-content: center; transition: background 0.2s;">
+				<span style="font-size: 14px; margin-left: 2px;">▶</span>
+			</button>
+		</div>
+	</div>
 
     <div class="section-title">Общая часть:</div>
 
