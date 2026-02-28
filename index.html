@@ -300,7 +300,10 @@
             if (globalCallsignData !== event.data.value) {
                 globalCallsignData = event.data.value;
                 localStorage.setItem('pso_global_callsign_data', globalCallsignData);
-                updateFinalOutput();
+                
+                // ОБЯЗАТЕЛЬНО: Обновляем только выдачу (текст справа)
+                // НО НЕ шлем broadcastData обратно в iframe, иначе он затрет ввод!
+                updateFinalOutput(); 
             }
         }
 
@@ -379,9 +382,11 @@
             renderZ(savedZ); // Показываем текст, если он уже есть
         }
 
-        // 2. ПОЗЫВНОЙ/ДАТА: предзаполняем системно
+        // 2. ПОЗЫВНОЙ/ДАТА: предзаполняем системно ТОЛЬКО если в localStorage совсем пусто
         var savedCall = localStorage.getItem('pso_global_callsign_data');
-        if (!savedCall || savedCall.trim() === "") {
+        
+        // Если данных НЕТ вообще (даже пустой строки), только тогда генерируем время
+        if (savedCall === null) { 
             var now = new Date();
             var dateStr = now.toLocaleDateString('ru-RU');
             var timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });

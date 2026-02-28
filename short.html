@@ -387,11 +387,30 @@
         window.parent.postMessage({ type: 'set_height', height: height }, '*');
     }
 
+    // ИСПРАВЛЕННАЯ ФУНКЦИЯ: не стирает позывной
     function setCurrentTime() {
         var callEl = document.getElementById('z_call');
         if (callEl) {
+            var currentVal = callEl.value || "";
             var now = new Date();
-            callEl.value = now.toLocaleDateString('ru-RU') + " " + now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+            var dateStr = now.toLocaleDateString('ru-RU');
+            var timeStr = now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+            var newStamp = dateStr + " " + timeStr;
+
+            // Ищем первую цифру (начало даты)
+            var firstDigitIndex = currentVal.search(/\d/);
+            var callsignOnly = "";
+
+            if (firstDigitIndex !== -1) {
+                // Если цифры есть, берем текст ДО них (позывной)
+                callsignOnly = currentVal.substring(0, firstDigitIndex).trim();
+            } else {
+                // Если цифр нет, значит всё поле — это позывной
+                callsignOnly = currentVal.trim();
+            }
+
+            // Собираем: Позывной (если есть) + новая дата/время
+            callEl.value = (callsignOnly ? callsignOnly + " " : "") + newStamp;
             syncEverything();
         }
     }
