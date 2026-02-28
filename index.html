@@ -4,164 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>ПСО Панель Опросников</title>
-    
     <style>
-        body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-            padding-top: env(safe-area-inset-top); 
-            background-color: #eceff1; 
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            overflow-x: hidden;
-        }
-
-        /* ИСПРАВЛЕННАЯ ШАПКА: Твой визуал + рабочая прокрутка на мобильных */
-        .header-nav {
-            background-color: #37474f;
-            padding: 4px 8px;
-            display: flex;
-            justify-content: flex-start; /* Изменено с center для работы скролла */
-            gap: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            z-index: 100;
-            position: sticky;
-            top: 0;
-            /* Включаем горизонтальный скролл */
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; /* Скрываем скроллбар в Firefox */
-            -ms-overflow-style: none;  /* Скрываем скроллбар в IE/Edge */
-        }
-
-        /* Скрываем скроллбар в Chrome/Safari */
-        .header-nav::-webkit-scrollbar {
-            display: none;
-        }
-
-        /* Центрируем кнопки на больших экранах, если они влезают */
-        @media (min-width: 900px) {
-            .header-nav {
-                justify-content: center;
-            }
-        }
-
+        /* ОСНОВНОЙ ВИЗУАЛ */
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; padding-top: env(safe-area-inset-top); background-color: #eceff1; min-height: 100vh; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+        
+        /* ШАПКА И НАВИГАЦИЯ */
+        .header-nav { background-color: #37474f; padding: 4px 8px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index: 1000; position: fixed; top: 0; left: 0; right: 0; height: 40px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
+        .header-nav::-webkit-scrollbar { display: none; }
+        
+        /* КНОПКИ УПРАВЛЕНИЯ */
         .clear-btn { background-color: #b71c1c; color: white; border: none; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .pin-btn { background-color: #546e7a; color: white; border: none; width: 30px; height: 30px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .pin-btn.active { background-color: #0288d1; }
         .nav-btn { background-color: #455a64; color: #cfd8dc; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; text-transform: uppercase; white-space: nowrap; }
         .nav-btn.active { background-color: #00c853; color: #fff; }
-
-        /* КОНТЕЙНЕР (Компактный) */
-        .main-wrapper {
-            display: flex;
-            width: 100%;
-            padding: 5px;
-            padding-right: 20px; 
-            gap: 10px;
-            box-sizing: border-box;
-            align-items: flex-start;
-        }
-
-        /* ЛЕВАЯ КОЛОНКА */
-        .form-side {
-            flex: 0 0 55%;
-            background: white;
-            border-radius: 4px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-            padding: 12px;
-            box-sizing: border-box;
-        }
-
-        /* ПРАВАЯ КОЛОНКА */
-        .result-side {
-            flex: 0 0 45%;
-            position: sticky;
-            top: 55px; 
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .sticky-header {
-            background: white;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #eee;
-            margin-bottom: 10px;
-            position: sticky;
-            top: 0; 
-            z-index: 5;
-        }
-        .sticky-header.unpinned { position: static !important; border-bottom: none; }
-
+        
+        /* КОНТЕЙНЕРЫ */
+        .main-wrapper { display: flex; width: 100%; padding: 5px; padding-right: 20px; margin-top: 48px; gap: 10px; box-sizing: border-box; align-items: flex-start; }
+        .form-side { flex: 0 0 55%; background: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); padding: 12px; box-sizing: border-box; position: relative; }
+        .result-side { flex: 0 0 45%; display: flex; flex-direction: column; gap: 8px; position: relative; }
+        
+        /* ЛИПКАЯ ЗАЯВКА */
+        .sticky-header { background: white; padding: 10px 12px; border-bottom: 2px solid #eee; position: fixed; top: 55px; left: 5px; width: calc(55% - 14px); z-index: 999; box-sizing: border-box; border-radius: 4px 4px 0 0; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.1); }
+        .sticky-header.unpinned { position: static !important; width: 100% !important; padding: 0 0 8px 0; margin-bottom: 10px; box-shadow: none; }
+        
+        /* ЭЛЕМЕНТЫ ВВОДА */
         #z_text { width: 100%; min-height: 75px; padding: 6px; box-sizing: border-box; border: 1px solid #cfd8dc; border-radius: 4px; font-family: inherit; font-size: 14px; }
-        
-        #z_fixed { 
-            display: none; 
-            background: #f1f8e9; 
-            padding: 8px; 
-            border-radius: 6px; 
-            border: 1px solid #c8e6c9; 
-            line-height: 1.4em;
-            max-height: 7em; 
-            overflow-y: auto; 
-            font-size: 13px; 
-            color: #1b5e20; 
-            white-space: pre-wrap;
-        }
-        
+        #z_fixed { display: none; background: #f1f8e9; padding: 8px; border-radius: 6px; border: 1px solid #c8e6c9; line-height: 1.4em; font-size: 13px; color: #1b5e20; white-space: pre-wrap; }
         .btn-ok { margin-top: 6px; background: #4caf50; color: white; border: none; border-radius: 4px; padding: 10px; width: 100%; cursor: pointer; font-weight: bold; }
-
-        #survey-frame {
-            width: 100%;
-            height: 550px; 
-            border: none;
-            display: block;
-            overflow: hidden;
-        }
-
-        /* ОКНО ВЫВОДА */
-        .btn-copy { background-color: #1976d2; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        #survey-frame { width: 100%; height: auto; min-height: 300px; border: none; display: block; overflow: hidden !important; margin-top: 140px; }
+        
+        /* ВЫДАЧА РЕЗУЛЬТАТА */
+        .btn-copy { background-color: #1976d2; color: white; border: none; padding: 12px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; position: fixed; top: 53px; right: 10px; width: calc(45% - 10px); z-index: 1001; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
         
         #output { 
-            width: 100%; 
-            height: calc(100vh - 155px); 
-            padding: 10px; 
+            width: calc(45% - 10px); 
+            position: fixed;
+            top: 105px; 
+            right: 10px;
+            bottom: 10px; 
+            height: auto; 
+            max-height: none; 
+            overflow-y: auto; 
+            padding: 10px 12px; 
             border-radius: 4px; 
             border: 1px solid #b0bec5; 
-            font-family: 'Courier New', monospace; 
-            font-size: 14px; 
+            font-family: 'Segoe UI', sans-serif; 
+            font-size: 13px; 
             background: white; 
             white-space: pre-wrap; 
-            resize: none; 
             box-sizing: border-box; 
-            outline: none; 
+            color: #263238; 
+            line-height: 1.3; 
+            margin-top: 0;
+            scrollbar-width: none; 
+            -ms-overflow-style: none; 
+        }
+        #output::-webkit-scrollbar { display: none; }
+
+        .res-row { margin-bottom: 2px; display: block; transition: background-color 0.3s ease; border-left: 3px solid transparent; }
+        .res-label { font-weight: 800; color: #1565c0; text-transform: uppercase; font-size: 11px; margin-right: 4px; }
+        .res-value { font-family: 'Consolas', 'Courier New', monospace; color: #000; font-size: 13px; }
+        
+        .res-row.active-focus {
+            background-color: #fff9c4;
+            border-left: 3px solid #00c853;
+            padding-left: 4px;
         }
         
-        #save-status { font-size: 11px; color: #78909c; text-align: right; margin-top: 2px; font-weight: bold; }
-
-        @media (max-width: 900px) {
-            .main-wrapper { flex-direction: column; padding-right: 5px; }
-            .form-side, .result-side { flex: 0 0 100%; width: 100%; position: static; }
-            #output { height: 350px; }
+        @media (max-width: 900px) { 
+            .main-wrapper { flex-direction: column; padding-right: 5px; margin-top: 50px; } 
+            .form-side, .result-side { flex: 0 0 100%; width: 100%; position: static; } 
+            .sticky-header { position: static !important; width: 100% !important; } 
+            #survey-frame { margin-top: 0 !important; } 
+            .btn-copy { position: static; width: 100%; margin-bottom: 8px; } 
+            #output { position: static; width: 100%; margin-top: 0; transform: none !important; max-height: none; } 
         }
     </style>
 </head>
 <body>
 
 <div class="header-nav" id="menu">
-    <button class="clear-btn" onclick="clearAllData()" title="Очистить всё">✕</button>
-    <button class="pin-btn active" id="master-pin-btn" onclick="togglePin()">📌</button>
+    <div style="display: flex; gap: 5px; justify-self: start;">
+        <button class="clear-btn" onclick="clearAllData()" title="Полная очистка">✕</button>
+        <button class="pin-btn active" id="master-pin-btn" onclick="togglePin()" title="Закрепить/открепить шапку заявки">📌</button>
+    </div>
     
-    <button class="nav-btn" onclick="openSurvey('short.html', this)">Короткий</button>
-    <button class="nav-btn" onclick="openSurvey('elderly.html', this)">Старики</button>
-    <button class="nav-btn" onclick="openSurvey('teens.html', this)">Подростки</button>
-    <button class="nav-btn" onclick="openSurvey('forest.html', this)">Лес</button>
-    <button class="nav-btn" onclick="openSurvey('adults.html', this)">Взрослые</button>
+    <div style="display: flex; gap: 5px; justify-content: center;">
+        <button class="nav-btn active" onclick="openSurvey('short.html', this)">Короткий</button>
+        <button class="nav-btn" onclick="openSurvey('elderly.html', this)">Старики</button>
+        <button class="nav-btn" onclick="openSurvey('teens.html', this)">Подростки</button>
+        <button class="nav-btn" onclick="openSurvey('forest.html', this)">Лес</button>
+        <button class="nav-btn" onclick="openSurvey('adults.html', this)">Взрослые</button>
+    </div>
+    
+    <div style="display: flex; gap: 5px; justify-self: end; padding-right: 10px;">
+        <button class="nav-btn" onclick="exportToJson()" title="Выгрузить JSON">💾</button>
+        <button class="nav-btn" onclick="document.getElementById('import-file').click()" title="Загрузить JSON">📂</button>
+        <input type="file" id="import-file" style="display:none" onchange="importFromJson(this)" accept=".json">
+    </div>
 </div>
 
 <div class="main-wrapper">
@@ -175,42 +116,66 @@
             <div id="z_fixed"><div id="z_value"></div></div>
             <button id="z_confirm_btn" class="btn-ok" onclick="fixZ()">ОК</button>
         </div>
-
         <iframe src="short.html" id="survey-frame" scrolling="no"></iframe>
     </div>
-
+    
     <div class="result-side">
-        <button class="btn-copy" id="copy-btn" onclick="copyText()">Скопировать результат</button>
-        <textarea id="output" readonly placeholder="Результат опроса появится здесь..."></textarea>
-        <div id="save-status">Обновлено: --:--:--</div>
+        <button class="btn-copy" id="copy-btn" onclick="copyText()">
+            <span>Скопировать результат</span>
+            <span id="save-status">Обновлено: --:--:--</span>
+        </button>
+        <div id="output">Результат опроса появится здесь...</div>
     </div>
 </div>
 
 <script>
-    const ORDER = ['short', 'elderly', 'teens', 'forest', 'adults'];
+    var ORDER = ['short', 'elderly', 'teens', 'forest', 'adults']; 
+    // globalZData — основной текст заявки
+    var globalZData = localStorage.getItem('pso_z_main') || "";
+    // globalCallsignData — "Позывной / Дата / Время" (идет в выдачу)
+    var globalCallsignData = localStorage.getItem('pso_global_callsign_data') || ""; 
+    var globalFields = JSON.parse(localStorage.getItem('pso_global_fields') || "{}"); 
     
-    // Это сердце синхронизации: здесь хранится общая строка "Позывной + Время"
-    let globalCallsignData = localStorage.getItem('pso_global_callsign_data') || "";
+    var currentSource = localStorage.getItem('last_survey_file') ? localStorage.getItem('last_survey_file').replace('.html', '') : 'short';
+    var scrollTimeout;
 
-    function togglePin() {
-        const btn = document.getElementById('master-pin-btn');
-        const header = document.getElementById('master-sticky');
-        const isActive = btn.classList.toggle('active');
-        header.classList.toggle('unpinned', !isActive);
+    function adjustFrameOffset() {
+        var header = document.getElementById('master-sticky');
+        var frame = document.getElementById('survey-frame');
+        if (header && frame && !header.classList.contains('unpinned') && window.innerWidth > 900) {
+            frame.style.marginTop = (header.offsetHeight + 10) + 'px';
+        } else {
+            if (frame) frame.style.marginTop = '0px';
+        }
     }
 
+    function togglePin() {
+        var btn = document.getElementById('master-pin-btn');
+        var header = document.getElementById('master-sticky');
+        if (!btn || !header) return;
+        var isActive = btn.classList.toggle('active');
+        header.classList.toggle('unpinned', !isActive);
+        adjustFrameOffset();
+    }
+
+    // ЛОГИКА БЛОКА ЗАЯВКА
     function fixZ() {
-        const val = document.getElementById('z_text').value.trim();
-        if(!val) return;
+        var val = document.getElementById('z_text').value; 
+        globalZData = val;
         localStorage.setItem('pso_z_main', val);
-        renderZ(val);
+        
+        if (val.trim() !== "") {
+            renderZ(val);
+        }
     }
 
     function renderZ(text) {
-        const valDiv = document.getElementById('z_value');
+        var valDiv = document.getElementById('z_value');
+        if (!valDiv) return;
         valDiv.innerHTML = "";
-        text.split('\n').forEach(line => {
-            const span = document.createElement('span');
+        var lines = text.split('\n');
+        lines.forEach(function(line) {
+            var span = document.createElement('span');
             span.innerText = line || ' ';
             valDiv.appendChild(span);
         });
@@ -218,33 +183,41 @@
         document.getElementById('z_confirm_btn').style.display = 'none';
         document.getElementById('z_fixed').style.display = 'block';
         document.getElementById('z_edit_btn').style.display = 'block';
+        setTimeout(adjustFrameOffset, 30);
     }
 
     function editZ() {
-        document.getElementById('z_text').style.display = 'block';
+        var zInput = document.getElementById('z_text');
+        zInput.value = globalZData;
+        zInput.style.display = 'block';
         document.getElementById('z_confirm_btn').style.display = 'block';
         document.getElementById('z_fixed').style.display = 'none';
         document.getElementById('z_edit_btn').style.display = 'none';
+        setTimeout(adjustFrameOffset, 30);
     }
 
-    // Рассылка строки позывной+время во фрейм
-    function broadcastData(value) {
-        const frame = document.getElementById('survey-frame');
+    function broadcastData(call, fields) {
+        var frame = document.getElementById('survey-frame');
         if (frame && frame.contentWindow) {
-            frame.contentWindow.postMessage({ type: 'set_global_data', value: value }, '*');
+            frame.contentWindow.postMessage({ type: 'set_global_data', value: call, fields: fields }, '*');
         }
     }
 
     function openSurvey(fileName, btn) {
-        const frame = document.getElementById('survey-frame');
+        var frame = document.getElementById('survey-frame');
+        if (!frame) return;
+        currentSource = fileName.replace('.html', '');
         frame.src = fileName;
-        const buttons = document.querySelectorAll('.nav-btn');
-        buttons.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        var navBtns = document.querySelectorAll('.nav-btn');
+        navBtns.forEach(function(b) { b.classList.remove('active'); });
+        if (btn) btn.classList.add('active');
         localStorage.setItem('last_survey_file', fileName);
         
-        // Как только вкладка загрузилась — отдаем ей текущий позывной/время
-        frame.onload = () => broadcastData(globalCallsignData);
+        frame.onload = function() {
+            broadcastData(globalCallsignData, globalFields);
+            adjustFrameOffset();
+            updateFinalOutput();
+        };
     }
 
     function clearAllData() {
@@ -255,92 +228,227 @@
     }
 
     function updateFinalOutput() {
-        let finalSections = [];
-        
-        // Добавляем общую строку (Позывной и Время) в самый верх
-        if (globalCallsignData) {
-            finalSections.push(globalCallsignData.trim());
+        var outDiv = document.getElementById('output');
+        if (!outDiv) return;
+        outDiv.innerHTML = ""; 
+
+        // 1. В ВЫДАЧУ ИДЕТ ТОЛЬКО ПОЗЫВНОЙ/ДАТА
+        var currentCall = globalCallsignData || "";
+
+        if (currentCall.trim() !== "") {
+            var callDiv = document.createElement('div');
+            callDiv.style.fontWeight = "bold";
+            callDiv.style.marginBottom = "20px";
+            callDiv.style.whiteSpace = "pre-wrap"; 
+            callDiv.innerText = currentCall;
+            outDiv.appendChild(callDiv);
         }
 
-        ORDER.forEach(source => {
-            const savedText = localStorage.getItem('survey_text_' + source);
-            if (savedText && savedText.trim() !== "") {
-                finalSections.push(savedText.trim());
-            }
-        });
+        // 2. Данные анкеты
+        var raw = localStorage.getItem('survey_text_' + currentSource);
+        if (raw) {
+            try {
+                var payload = JSON.parse(raw);
+                if (Array.isArray(payload)) {
+                    payload.forEach(function(item, index) {
+                        var row = document.createElement('div');
+                        row.className = 'res-row';
+                        row.id = 'row-' + currentSource + '-' + index;
+                        if (item.label && item.label.trim() !== "") {
+                            row.innerHTML = '<span class="res-label">' + item.label + ':</span> <span class="res-value">' + item.value + '</span>';
+                        } else {
+                            row.innerHTML = '<span class="res-value">' + item.value + '</span>';
+                        }
+                        outDiv.appendChild(row);
+                    });
+                }
+            } catch(e) { console.error("Ошибка отрисовки", e); }
+        }
 
-        document.getElementById('output').value = finalSections.join('\n\n');
-        document.getElementById('save-status').innerText = "Обновлено: " + new Date().toLocaleTimeString();
+        if (outDiv.innerHTML === "") outDiv.innerText = "Результат опроса [" + currentSource + "] появится здесь...";
+
+        var status = document.getElementById('save-status');
+        if (status) {
+            var timeStrStatus = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            status.innerText = "Обновлено " + timeStrStatus;
+        }
     }
-
-// Объект для хранения всех общих полей
-    let globalFields = JSON.parse(localStorage.getItem('pso_global_fields') || "{}");
 
     window.addEventListener('message', function(event) {
         if (event.data.type === 'survey_update') {
-            localStorage.setItem('survey_text_' + event.data.source, event.data.text);
-            updateFinalOutput();
+            localStorage.setItem('survey_text_' + event.data.source, JSON.stringify(event.data.payload));
+            if (event.data.source === currentSource) updateFinalOutput();
         }
 
-        // Синхронизация позывного (старая логика)
+        if (event.data.type === 'sync_scroll') {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(function() {
+                var targetId = 'row-' + event.data.source + '-' + event.data.index;
+                var targetRow = document.getElementById(targetId);
+                var outputBox = document.getElementById('output');
+                if (targetRow && outputBox) {
+                    document.querySelectorAll('.res-row').forEach(function(r) { r.classList.remove('active-focus'); });
+                    targetRow.classList.add('active-focus');
+                    var scrollTarget = targetRow.offsetTop - outputBox.offsetTop - (outputBox.clientHeight / 3);
+                    outputBox.scrollTo({ top: scrollTarget, behavior: 'smooth' });
+                }
+            }, 100);
+        }
+
         if (event.data.type === 'sync_globals') {
-            globalCallsignData = event.data.value;
-            localStorage.setItem('pso_global_callsign_data', globalCallsignData);
-            broadcastData(globalCallsignData, globalFields); // Рассылаем и позывной, и поля
-            updateFinalOutput();
+            if (globalCallsignData !== event.data.value) {
+                globalCallsignData = event.data.value;
+                localStorage.setItem('pso_global_callsign_data', globalCallsignData);
+                updateFinalOutput();
+            }
         }
 
-        // НОВОЕ: Синхронизация общих полей (ФИО, Здоровье и т.д.)
         if (event.data.type === 'sync_field') {
-            globalFields[event.data.fieldId] = event.data.value;
-            localStorage.setItem('pso_global_fields', JSON.stringify(globalFields));
-            broadcastData(globalCallsignData, globalFields);
+            if (globalFields[event.data.fieldId] !== event.data.value) {
+                globalFields[event.data.fieldId] = event.data.value;
+                localStorage.setItem('pso_global_fields', JSON.stringify(globalFields));
+                broadcastData(globalCallsignData, globalFields);
+            }
         }
 
         if (event.data.type === 'set_height') {
-            const frame = document.getElementById('survey-frame');
-            if (frame) frame.style.height = (event.data.height + 50) + 'px';
+            var frame = document.getElementById('survey-frame');
+            if (frame && event.data.height) {
+                frame.style.height = event.data.height + 'px';
+                adjustFrameOffset();
+            }
         }
     });
 
-    // Обновляем функцию рассылки, чтобы она передавала и объект с полями
-    function broadcastData(call, fields) {
-        const frame = document.getElementById('survey-frame');
-        if (frame && frame.contentWindow) {
-            frame.contentWindow.postMessage({ 
-                type: 'set_global_data', 
-                value: call,
-                fields: fields 
-            }, '*');
-        }
-    };
-
     function copyText() {
-        const out = document.getElementById('output');
-        out.select();
-        out.setSelectionRange(0, 99999);
-        try {
-            document.execCommand('copy');
-            const btn = document.getElementById('copy-btn');
-            btn.innerText = "СКОПИРОВАНО!";
-            btn.style.backgroundColor = "#00c853";
-            setTimeout(() => {
-                btn.innerText = "Скопировать результат";
-                btn.style.backgroundColor = "#1976d2";
-            }, 1200);
-        } catch (err) {}
+    var out = document.getElementById('output');
+    if (!out || out.innerText.indexOf('Результат опроса') === 0) return;
+
+    var finalString = "";
+    
+    // Перебираем все элементы внутри output
+    var elements = out.childNodes;
+    elements.forEach(function(node) {
+        // Если это div с данными анкеты или позывным
+        if (node.nodeType === 1) { 
+            // Клонируем узел, чтобы не испортить отображение на экране
+            var tempNode = node.cloneNode(true);
+            
+            // Если внутри есть label (префикс), убираем у него капс стиля
+            var labels = tempNode.querySelectorAll('.res-label');
+            labels.forEach(function(l) {
+                l.style.textTransform = 'none';
+            });
+
+            // Добавляем текст этого узла и принудительный перенос строки
+            finalString += tempNode.innerText.trim() + "\n";
+        }
+    });
+
+    // Копируем полученную строку
+    var tempArea = document.createElement('textarea');
+    tempArea.value = finalString.trim(); // trim уберет лишний перенос в самом конце
+    document.body.appendChild(tempArea);
+    tempArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempArea);
+
+    // Анимация кнопки
+    var btn = document.getElementById('copy-btn');
+    if (btn) {
+        var oldContent = btn.innerHTML;
+        btn.innerHTML = "<span>СКОПИРОВАНО!</span>";
+        btn.style.backgroundColor = "#00c853";
+        setTimeout(function() { 
+            btn.innerHTML = oldContent; 
+            btn.style.backgroundColor = "#1976d2"; 
+        }, 1200);
     }
+}
 
     window.onload = function() {
-        const savedZ = localStorage.getItem('pso_z_main');
-        if(savedZ) renderZ(savedZ);
-        const lastFile = localStorage.getItem('last_survey_file') || 'short.html';
-        const buttons = document.querySelectorAll('.nav-btn');
-        buttons.forEach(b => {
-            if (b.getAttribute('onclick').includes(lastFile)) openSurvey(lastFile, b);
+        // 1. ЗАЯВКА: Если пустая — открываем для ввода сразу
+        var savedZ = localStorage.getItem('pso_z_main') || "";
+        globalZData = savedZ;
+        document.getElementById('z_text').value = savedZ;
+        
+        if (savedZ.trim() === "") {
+            editZ(); // Поле активно сразу
+        } else {
+            renderZ(savedZ); // Показываем текст, если он уже есть
+        }
+
+        // 2. ПОЗЫВНОЙ/ДАТА: предзаполняем системно
+        var savedCall = localStorage.getItem('pso_global_callsign_data');
+        if (!savedCall || savedCall.trim() === "") {
+            var now = new Date();
+            var dateStr = now.toLocaleDateString('ru-RU');
+            var timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            savedCall = dateStr + " " + timeStr + "\n";
+            localStorage.setItem('pso_global_callsign_data', savedCall);
+        }
+        globalCallsignData = savedCall;
+        
+        var lastFile = localStorage.getItem('last_survey_file') || 'short.html';
+        var buttons = document.querySelectorAll('.nav-btn');
+        var found = false;
+        buttons.forEach(function(btn) {
+            if (btn.getAttribute('onclick') && btn.getAttribute('onclick').indexOf(lastFile) !== -1) {
+                openSurvey(lastFile, btn);
+                found = true;
+            }
         });
+        if(!found && buttons.length > 0) openSurvey('short.html', buttons);
+
         updateFinalOutput();
     };
+
+    window.addEventListener('resize', adjustFrameOffset);
+    
+    function exportToJson() {
+        var backup = {};
+        for (var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            if (key.indexOf('survey_') === 0 || key.indexOf('pso_') === 0 || key === 'last_survey_file' || key === 'pso_last_gender') {
+                backup[key] = localStorage.getItem(key);
+            }
+        }
+        var jsonString = JSON.stringify(backup, null, 2);
+        var blob = new Blob([jsonString], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+        var downloadLink = document.createElement('a');
+        var time = new Date().toLocaleTimeString('ru-RU').replace(/:/g, '-');
+        downloadLink.href = url;
+        downloadLink.download = "pso_backup_" + time + ".json";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(url);
+    }
+
+    function importFromJson(el) {
+        if (!el || !el.files || el.files.length === 0) return;
+        var fileToLoad = el.files[0]; 
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var data = JSON.parse(e.target.result);
+                if (confirm("Заменить данные?")) {
+                    localStorage.clear();
+                    for (var key in data) { localStorage.setItem(key, data[key]); }
+                    location.reload();
+                }
+            } catch (err) { alert("Ошибка файла"); }
+        };
+        reader.readAsText(fileToLoad);
+        el.value = "";
+    }
+
+    window.addEventListener("drop", function(e) {
+        e.preventDefault();
+        var files = e.dataTransfer.files;
+        if (files.length > 0) importFromJson({ files: files });
+    }, false);
 </script>
 </body>
 </html>
