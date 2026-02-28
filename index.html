@@ -405,26 +405,55 @@
 
     window.addEventListener('resize', adjustFrameOffset);
     
-    function exportToJson() {
+	function exportToJson() {
+    try {
         var backup = {};
-        for (var i = 0; i < localStorage.length; i++) {
-            var key = localStorage.key(i);
-            if (key.indexOf('survey_') === 0 || key.indexOf('pso_') === 0 || key === 'last_survey_file' || key === 'pso_last_gender') {
-                backup[key] = localStorage.getItem(key);
+        // Собираем данные
+        var keys = Object.keys(localStorage);
+        for (var i = 0; i < keys.length; i++) {
+            var k = keys[i];
+            if (k && (k.indexOf('survey_') === 0 || k.indexOf('pso_') === 0 || k === 'last_survey_file' || k === 'pso_last_gender')) {
+                backup[k] = localStorage.getItem(k);
             }
         }
-        var jsonString = JSON.stringify(backup, null, 2);
-        var blob = new Blob([jsonString], { type: "application/json" });
+
+        // --- УЛЬТРА-БЕЗОПАСНОЕ ИМЯ ---
+        var callsign = localStorage.getItem('pso_global_callsign_data');
+        
+        // 1. Превращаем в строку, что бы там ни лежало
+        var rawString = String(callsign || "pso_backup");
+        
+        // 2. Берем первую строку и СРАЗУ делаем её строкой еще раз для гарантии
+        var firstLine = String(rawString.split('\n'));
+        
+        // 3. Теперь чистим. trim() теперь точно сработает.
+        var safeName = firstLine.trim()
+            .replace(/[:.\/\\?%*|"<>]/g, '-') 
+            .replace(/\s+/g, '_');
+
+        if (!safeName) safeName = "pso_backup";
+
+        // --- СОХРАНЕНИЕ ---
+        var dataStr = JSON.stringify(backup, null, 2);
+        var blob = new Blob([dataStr], {type: "application/json"});
         var url = URL.createObjectURL(blob);
-        var downloadLink = document.createElement('a');
-        var time = new Date().toLocaleTimeString('ru-RU').replace(/:/g, '-');
-        downloadLink.href = url;
-        downloadLink.download = "pso_backup_" + time + ".json";
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(url);
+        
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = safeName + ".json";
+        
+        document.body.appendChild(link);
+        link.click();
+        
+        setTimeout(function() {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+
+    } catch (e) {
+        alert("Ошибка при сохранении: " + e.message);
     }
+}
 
     function importFromJson(el) {
         if (!el || !el.files || el.files.length === 0) return;
