@@ -389,30 +389,28 @@
 
     // ИСПРАВЛЕННАЯ ФУНКЦИЯ: не стирает позывной
     function setCurrentTime() {
-        var callEl = document.getElementById('z_call');
-        if (callEl) {
-            var currentVal = callEl.value || "";
-            var now = new Date();
-            var dateStr = now.toLocaleDateString('ru-RU');
-            var timeStr = now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
-            var newStamp = dateStr + " " + timeStr;
+        const el = document.getElementById('z_call');
+        if (!el) return;
 
-            // Ищем первую цифру (начало даты)
-            var firstDigitIndex = currentVal.search(/\d/);
-            var callsignOnly = "";
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('ru-RU');
+        const timeStr = now.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+        const newDateTime = dateStr + " " + timeStr;
 
-            if (firstDigitIndex !== -1) {
-                // Если цифры есть, берем текст ДО них (позывной)
-                callsignOnly = currentVal.substring(0, firstDigitIndex).trim();
-            } else {
-                // Если цифр нет, значит всё поле — это позывной
-                callsignOnly = currentVal.trim();
-            }
+        let val = el.value || "";
+        const dateTimePattern = /\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}/;
+        
+        // Если время в поле уже есть, мы его не переписываем текущим!
+        if (dateTimePattern.test(val)) return;
 
-            // Собираем: Позывной (если есть) + новая дата/время
-            callEl.value = (callsignOnly ? callsignOnly + " " : "") + newStamp;
-            syncEverything();
-        }
+        let callsign = val.replace(dateTimePattern, '').trim();
+        el.value = (callsign.length > 0 ? callsign + " " : "") + newDateTime;
+
+        localStorage.setItem('pso_global_callsign_data', el.value);
+        window.parent.postMessage({ type: 'sync_globals', value: el.value }, '*');
+
+        saveLocal();
+        syncEverything();
     }
 
     function initScrollSync() {
@@ -440,12 +438,25 @@
     });
 
     window.onload = function() {
+        // 1. Сначала загружаем локальные данные (в том числе из импортированного файла)
         loadLocal(); 
         updateLabelsOnPage(); 
+        
+        // 2. Проверяем позывной в глобальном хранилище
+        var globalCall = localStorage.getItem('pso_global_callsign_data');
         var callEl = document.getElementById('z_call');
-        if (callEl && (!callEl.value || callEl.value.trim() === "")) {
-            setCurrentTime();
+        
+        if (callEl) {
+            // Если в localStorage УЖЕ что-то есть (например, из загруженного файла)
+            if (globalCall && globalCall.trim() !== "") {
+                callEl.value = globalCall;
+            } 
+            // И ТОЛЬКО ЕСЛИ ТАМ ПУСТО — ставим текущее время
+            else if (!callEl.value || callEl.value.trim() === "") {
+                setCurrentTime();
+            }
         }
+
         syncEverything();
         setTimeout(function() {
             sendHeight();
